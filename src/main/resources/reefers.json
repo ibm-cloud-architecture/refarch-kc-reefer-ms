@@ -1,0 +1,32 @@
+[
+   {
+      "reeferID": "C01",
+      "capacity": 100,
+      "type": "B13",
+      "brand": "Binder",
+      "status": "free",
+      "currentFreeCapacity": 100,
+      "location": "San Francisco",
+      "creationDate": "2022-03-30"
+   },
+   {
+      "reeferID": "C02",
+      "capacity": 80,
+      "type": "B12",
+      "brand": "Binder",
+      "status": "free",
+      "currentFreeCapacity": 100,
+      "location": "San Francisco",
+      "creationDate": "2022-03-20"
+   },
+   {
+      "reeferID": "C03",
+      "capacity": 100,
+      "type": "B13",
+      "brand": "Binder",
+      "status": "free",
+      "currentFreeCapacity": 100,
+      "location": "New York",
+      "creationDate": "2022-03-10"
+   }
+]
