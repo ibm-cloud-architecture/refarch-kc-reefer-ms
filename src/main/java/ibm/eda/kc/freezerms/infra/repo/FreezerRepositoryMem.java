@@ -97,6 +97,13 @@ public class FreezerRepositoryMem implements FreezerRepository {
     }
 
     public void cleanTransaction(String transactionID) {
-        this.currentOrderBacklog.remove(transactionID);
+        List<Freezer> allocatedFreezers = this.currentOrderBacklog.get(transactionID);
+        if (allocatedFreezers != null) {
+            for (Freezer f: allocatedFreezers) {
+                f.status= Freezer.FREE;
+                f.currentFreeCapacity = f.capacity;
+            }
+        }
+        this.currentOrderBacklog.remove(transactionID);     
     }
 }

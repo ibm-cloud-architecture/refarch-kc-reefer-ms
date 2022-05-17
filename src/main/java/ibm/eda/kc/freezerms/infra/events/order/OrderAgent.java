@@ -38,11 +38,11 @@ public class OrderAgent {
         OrderEvent oe = messageWithOrderEvent.getPayload();
         switch( oe.getType()){
             case OrderEvent.ORDER_CREATED_TYPE:
-                ReeferEvent re=processOrderCreatedEvent(oe);
-                reeferEventProducer.sendEvent(re.reeferID,re);
+                processOrderCreatedEvent(oe);
                 break;
             case OrderEvent.ORDER_UPDATED_TYPE:
-                logger.info("Receive order update");
+                logger.info("Receive order update " + oe.status);
+                compensateOrder(oe.orderID);
                 break;
             default:
                 break;
@@ -59,10 +59,17 @@ public class OrderAgent {
         List<Freezer> freezers = repo.getFreezersForOrder(oe.orderID, 
                                 oce.pickupCity, 
                                 oe.quantity);
-        ReeferAllocated reeferAllocatedEvent = new ReeferAllocated(freezers,oe.orderID);
-        ReeferEvent re = new ReeferEvent(ReeferEvent.REEFER_ALLOCATED_TYPE,reeferAllocatedEvent);
-        re.reeferID = reeferAllocatedEvent.reeferIDs;       
-        return re;
+        if (freezers.size() > 0) {
+            ReeferAllocated reeferAllocatedEvent = new ReeferAllocated(freezers,oe.orderID);
+            ReeferEvent re = new ReeferEvent(ReeferEvent.REEFER_ALLOCATED_TYPE,reeferAllocatedEvent);
+            re.reeferID = reeferAllocatedEvent.reeferIDs;     
+            reeferEventProducer.sendEvent(re.reeferID,re);  
+            return re;
+        }
+        return null;
     }
  
+    public void compensateOrder(String oid) {
+        repo.cleanTransaction(oid);
+    }
 }

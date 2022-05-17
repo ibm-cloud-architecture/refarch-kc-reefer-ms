@@ -37,4 +37,8 @@ public class FreezerService {
     public Freezer updateFreezer(Freezer newFreezer) {
         return repository.updateFreezer(newFreezer);
     }
+
+    public List<Freezer> getAllReefersForTransaction(String txid) {
+        return repository.getFreezersForTransaction(txid);
+    }
 }

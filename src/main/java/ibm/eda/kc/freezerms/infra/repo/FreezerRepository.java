@@ -10,4 +10,6 @@ public interface FreezerRepository {
     public Freezer updateFreezer(Freezer entity);
     public Freezer getById(String key);
     public List<Freezer>  getFreezersForOrder(String transactionID,String pickupLocation,long expectedCapacity);
+    public List<Freezer> getFreezersForTransaction(String transactionID);
+    public void cleanTransaction(String transactionID);
 }

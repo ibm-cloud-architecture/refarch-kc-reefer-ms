@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -28,4 +29,9 @@ public class ReeferResource {
         return serv.getAllReefers();
     }
 
+    @GET
+    @Path("/{txid}")
+    public List<Freezer> getAllFreezerForAtransaction(@PathParam("txid") String txid) {
+        return serv.getAllReefersForTransaction(txid);
+    }
 }
