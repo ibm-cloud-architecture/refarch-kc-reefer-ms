@@ -30,7 +30,7 @@ public class ReeferResource {
     }
 
     @GET
-    @Path("/{txid}")
+    @Path("/transaction/{txid}")
     public List<Freezer> getAllFreezerForAtransaction(@PathParam("txid") String txid) {
         return serv.getAllReefersForTransaction(txid);
     }
