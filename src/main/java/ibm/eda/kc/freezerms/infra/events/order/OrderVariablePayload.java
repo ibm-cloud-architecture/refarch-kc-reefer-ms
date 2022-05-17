@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 @JsonTypeInfo(use=Id.DEDUCTION)
-@JsonSubTypes({@Type(OrderCreatedEvent.class)})
+@JsonSubTypes({@Type(OrderCreatedEvent.class),@Type(OrderUpdatedEvent.class)})
 public abstract class  OrderVariablePayload {
 
 }

@@ -13,9 +13,9 @@ import ibm.eda.kc.freezerms.domain.Freezer;
 import ibm.eda.kc.freezerms.infra.events.order.OrderAgent;
 import ibm.eda.kc.freezerms.infra.events.order.OrderCreatedEvent;
 import ibm.eda.kc.freezerms.infra.events.order.OrderEvent;
-import ibm.eda.kc.freezerms.infra.events.order.OrderEventDeserializer;
 import ibm.eda.kc.freezerms.infra.events.reefer.ReeferAllocated;
 import ibm.eda.kc.freezerms.infra.events.reefer.ReeferEvent;
+import ibm.eda.kc.freezerms.infra.events.reefer.ReeferEventDeserializer;
 import ibm.eda.kc.freezerms.infra.repo.FreezerRepository;
 import io.quarkus.kafka.client.serialization.ObjectMapperSerializer;
 import io.quarkus.test.junit.QuarkusTest;
@@ -35,19 +35,19 @@ public class TestProcessOrderCreatedEvent {
         Assertions.assertEquals(2,f.size());
     }
 
+
     @Test
     public void shouldBeAbleToCast(){
-        OrderCreatedEvent oce = new OrderCreatedEvent("Sydney","San Francisco");
+        ReeferAllocated oce = new ReeferAllocated("RE01","Order01");
 
-        OrderEvent oe = new OrderEvent(OrderEvent.ORDER_CREATED_TYPE,oce);
-        oe.orderID = "Test01";
-        oe.quantity = 80;
-        ObjectMapperSerializer<OrderEvent> mapper = new ObjectMapperSerializer<OrderEvent>();
-        byte[] inMessage = mapper.serialize("orders", oe);
-        OrderEventDeserializer deserialize = new OrderEventDeserializer();
-        OrderEvent oe2 = deserialize.deserialize("orders", inMessage);
-        OrderCreatedEvent oce2 = (OrderCreatedEvent)oe2.payload;
-        Assertions.assertEquals("San Francisco", oce2.pickupCity);
+        ReeferEvent oe = new ReeferEvent();
+        oe.payload = oce;
+        ObjectMapperSerializer<ReeferEvent> mapper = new ObjectMapperSerializer<ReeferEvent>();
+        byte[] inMessage = mapper.serialize("reefers", oe);
+        ReeferEventDeserializer deserialize = new ReeferEventDeserializer();
+        ReeferEvent oe2 = deserialize.deserialize("reefers", inMessage);
+        ReeferAllocated oce2 = (ReeferAllocated)oe2.payload;
+        Assertions.assertEquals("Order01", oce2.orderID);
         mapper.close();
         deserialize.close();
     }

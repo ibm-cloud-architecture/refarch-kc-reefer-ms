@@ -1,6 +1,7 @@
 package ibm.eda.kc.freezerms.infra.events.reefer;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -12,12 +13,13 @@ import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata;
 
 @ApplicationScoped
 public class ReeferEventProducer {
-    
+	Logger logger = Logger.getLogger(ReeferEventProducer.class.getName());
     @Channel("reefers")
 	public Emitter<ReeferEvent> reeferEventProducer;
 
 
     public void sendEvent(String key, ReeferEvent reeferEvent){
+		logger.info("Send event -> " + reeferEvent.reeferID + " ts:" + reeferEvent.getTimestampMillis());
 		reeferEventProducer.send(Message.of(reeferEvent).addMetadata(OutgoingKafkaRecordMetadata.<String>builder()
 			.withKey(key).build())
 			.withAck( () -> {

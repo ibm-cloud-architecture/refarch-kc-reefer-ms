@@ -25,7 +25,7 @@ public class FreezerRepositoryMem implements FreezerRepository {
         super();
         InputStream is = getClass().getClassLoader().getResourceAsStream("reefers.json");
         if (is == null) 
-            throw new IllegalAccessError("file not found for order json");
+            throw new IllegalAccessError("file not found for reefer json");
         try {
             List<Freezer> currentDefinitions = mapper.readValue(is, mapper.getTypeFactory().constructCollectionType(List.class, Freezer.class));
             currentDefinitions.stream().forEach( (t) -> { 

@@ -41,6 +41,9 @@ public class OrderAgent {
                 ReeferEvent re=processOrderCreatedEvent(oe);
                 reeferEventProducer.sendEvent(re.reeferID,re);
                 break;
+            case OrderEvent.ORDER_UPDATED_TYPE:
+                logger.info("Receive order update");
+                break;
             default:
                 break;
         }
@@ -57,11 +60,8 @@ public class OrderAgent {
                                 oce.pickupCity, 
                                 oe.quantity);
         ReeferAllocated reeferAllocatedEvent = new ReeferAllocated(freezers,oe.orderID);
-        ReeferEvent re = new ReeferEvent();
-        re.reeferID = reeferAllocatedEvent.reeferIDs;
-        re.setType(ReeferEvent.REEFER_ALLOCATED_TYPE);
-        re.payload = reeferAllocatedEvent;
-       
+        ReeferEvent re = new ReeferEvent(ReeferEvent.REEFER_ALLOCATED_TYPE,reeferAllocatedEvent);
+        re.reeferID = reeferAllocatedEvent.reeferIDs;       
         return re;
     }
  
