@@ -43,10 +43,10 @@ public class TestOrderEventProcessing {
         records.add(new ProducerRecord<String,OrderEvent>("orders",oe.orderID,oe));
         companion.produce(String.class, OrderEvent.class).fromRecords(records);
 
-        ConsumerTask<String,ReeferEvent> reefers = companion.consume(String.class, ReeferEvent.class).fromTopics("reefers", 10);
+        ConsumerTask<String,ReeferEvent> reefers = companion.consume(String.class, ReeferEvent.class).fromTopics("reefers", 1);
         reefers.awaitCompletion();
         ConsumerRecord<String,ReeferEvent> reeferEventRecord = reefers.getFirstRecord();
-        System.out.println(reeferEventRecord.value().reeferID);
+        System.out.println("Reefer allocated is --> " + reeferEventRecord.value().reeferID);
     }
 
     /*

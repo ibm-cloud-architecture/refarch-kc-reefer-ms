@@ -4,35 +4,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ibm.eda.kc.freezerms.domain.Freezer;
+import ibm.eda.kc.freezerms.domain.Reefer;
 
 @ApplicationScoped
-public class FreezerRepositoryMem implements FreezerRepository {
-    public  static ConcurrentHashMap<String,List<Freezer>> byLocation = new ConcurrentHashMap<String,List<Freezer>>();
-    private ConcurrentHashMap<String, List<Freezer>> currentOrderBacklog = new ConcurrentHashMap<String,List<Freezer>>();
-    private static ConcurrentHashMap<String,Freezer> freezers = new ConcurrentHashMap<String,Freezer>();
+public class ReeferRepositoryMem implements ReeferRepository {
+    public  static ConcurrentHashMap<String,List<Reefer>> byLocation = new ConcurrentHashMap<String,List<Reefer>>();
+    private ConcurrentHashMap<String, List<Reefer>> currentOrderBacklog = new ConcurrentHashMap<String,List<Reefer>>();
+    private static ConcurrentHashMap<String,Reefer> reefers = new ConcurrentHashMap<String,Reefer>();
 
     private static ObjectMapper mapper = new ObjectMapper();
     
 
-    public FreezerRepositoryMem() {
+    public ReeferRepositoryMem() {
         super();
         InputStream is = getClass().getClassLoader().getResourceAsStream("reefers.json");
         if (is == null) 
             throw new IllegalAccessError("file not found for reefer json");
         try {
-            List<Freezer> currentDefinitions = mapper.readValue(is, mapper.getTypeFactory().constructCollectionType(List.class, Freezer.class));
+            List<Reefer> currentDefinitions = mapper.readValue(is, mapper.getTypeFactory().constructCollectionType(List.class, Reefer.class));
             currentDefinitions.stream().forEach( (t) -> { 
-                freezers.put(t.reeferID,t);
+                reefers.put(t.reeferID,t);
                 if (t.location != null) {
                     if (byLocation.get(t.location) == null) 
-                        byLocation.put(t.location, new ArrayList<Freezer>());
+                        byLocation.put(t.location, new ArrayList<Reefer>());
                     byLocation.get(t.location).add(t);
                 }
                 
@@ -40,26 +41,29 @@ public class FreezerRepositoryMem implements FreezerRepository {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        freezers.values().stream().forEach(v -> System.out.println(v.reeferID));
+        reefers.values().stream().forEach(v -> System.out.println(v.reeferID));
     }
 
-    public List<Freezer> getAll(){
-        return new ArrayList<Freezer>(freezers.values());
+    public List<Reefer> getAll(){
+        return new ArrayList<Reefer>(reefers.values());
     }
 
-    public Freezer addFreezer(Freezer entity) {
-        freezers.put(entity.reeferID, entity);
+    public Reefer addReefer(Reefer entity) {
+        if (entity.reeferID == null) {
+            entity.reeferID = UUID.randomUUID().toString();
+        }
+        reefers.put(entity.reeferID, entity);
         return entity;
     }
 
-    public Freezer updateFreezer(Freezer entity) {
-        freezers.put(entity.reeferID, entity);
+    public Reefer updateReefer(Reefer entity) {
+        reefers.put(entity.reeferID, entity);
         return entity;
     }
 
     @Override
-    public Freezer getById(String key) {
-        return freezers.get(key);
+    public Reefer getById(String key) {
+        return reefers.get(key);
     }
 
     /**
@@ -68,15 +72,15 @@ public class FreezerRepositoryMem implements FreezerRepository {
      * @param expectedCapacity
      * @return list of freezers support this expected catacity and at the expected location
      */
-    public  List<Freezer>  getFreezersForOrder(String transactionID,String pickupLocation,long expectedCapacity) {
-        List<Freezer> potentials = new ArrayList<Freezer>();
+    public  List<Reefer>  getReefersForOrder(String transactionID,String pickupLocation,long expectedCapacity) {
+        List<Reefer> potentials = new ArrayList<Reefer>();
         if (pickupLocation == null) return potentials;
         if (byLocation.get(pickupLocation) != null) {
             currentOrderBacklog.put(transactionID, potentials);
-            for (Freezer reefer : byLocation.get(pickupLocation)) {
-                if (reefer.status.equals(Freezer.FREE)) {
+            for (Reefer reefer : byLocation.get(pickupLocation)) {
+                if (reefer.status.equals(Reefer.FREE)) {
                    
-                    reefer.status = Freezer.ALLOCATED;
+                    reefer.status = Reefer.ALLOCATED;
                     potentials.add(reefer);
                     if (expectedCapacity > reefer.capacity) {
                         reefer.currentFreeCapacity = 0;
@@ -92,15 +96,15 @@ public class FreezerRepositoryMem implements FreezerRepository {
         return potentials;
     }
 
-    public List<Freezer> getFreezersForTransaction(String transactionID) {
+    public List<Reefer> getReefersForTransaction(String transactionID) {
         return currentOrderBacklog.get(transactionID);
     }
 
     public void cleanTransaction(String transactionID) {
-        List<Freezer> allocatedFreezers = this.currentOrderBacklog.get(transactionID);
+        List<Reefer> allocatedFreezers = this.currentOrderBacklog.get(transactionID);
         if (allocatedFreezers != null) {
-            for (Freezer f: allocatedFreezers) {
-                f.status= Freezer.FREE;
+            for (Reefer f: allocatedFreezers) {
+                f.status= Reefer.FREE;
                 f.currentFreeCapacity = f.capacity;
             }
         }

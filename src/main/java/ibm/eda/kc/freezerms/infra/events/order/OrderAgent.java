@@ -10,11 +10,11 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 
-import ibm.eda.kc.freezerms.domain.Freezer;
+import ibm.eda.kc.freezerms.domain.Reefer;
 import ibm.eda.kc.freezerms.infra.events.reefer.ReeferAllocated;
 import ibm.eda.kc.freezerms.infra.events.reefer.ReeferEvent;
 import ibm.eda.kc.freezerms.infra.events.reefer.ReeferEventProducer;
-import ibm.eda.kc.freezerms.infra.repo.FreezerRepository;
+import ibm.eda.kc.freezerms.infra.repo.ReeferRepository;
 
 /**
  * Listen to the orders topic and processes event from order service:
@@ -27,7 +27,7 @@ public class OrderAgent {
     Logger logger = Logger.getLogger(OrderAgent.class.getName());
 
     @Inject
-    FreezerRepository repo;
+    ReeferRepository repo;
 
     @Inject
     ReeferEventProducer reeferEventProducer;
@@ -56,11 +56,11 @@ public class OrderAgent {
      */
     public ReeferEvent processOrderCreatedEvent( OrderEvent oe){
         OrderCreatedEvent oce = (OrderCreatedEvent)oe.payload;
-        List<Freezer> freezers = repo.getFreezersForOrder(oe.orderID, 
+        List<Reefer> reefers = repo.getReefersForOrder(oe.orderID, 
                                 oce.pickupCity, 
                                 oe.quantity);
-        if (freezers.size() > 0) {
-            ReeferAllocated reeferAllocatedEvent = new ReeferAllocated(freezers,oe.orderID);
+        if (reefers.size() > 0) {
+            ReeferAllocated reeferAllocatedEvent = new ReeferAllocated(reefers,oe.orderID);
             ReeferEvent re = new ReeferEvent(ReeferEvent.REEFER_ALLOCATED_TYPE,reeferAllocatedEvent);
             re.reeferID = reeferAllocatedEvent.reeferIDs;     
             reeferEventProducer.sendEvent(re.reeferID,re);  

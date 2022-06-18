@@ -2,7 +2,7 @@ package ibm.eda.kc.freezerms.infra.events.reefer;
 
 import java.util.List;
 
-import ibm.eda.kc.freezerms.domain.Freezer;
+import ibm.eda.kc.freezerms.domain.Reefer;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 /**
@@ -16,13 +16,13 @@ public class ReeferAllocated extends ReeferVariablePayload {
 
 	public ReeferAllocated() {}
 
-	public ReeferAllocated(List<Freezer> freezers , String oid) {
+	public ReeferAllocated(List<Reefer> freezers , String oid) {
 		this.orderID = oid;
 		if (freezers.size() == 1) {
 			this.reeferIDs = freezers.get(0).reeferID;
 		} else {
 			this.aggregate = true;
-			for (Freezer f : freezers) {
+			for (Reefer f : freezers) {
 				reeferIDs = reeferIDs + f.reeferID + ",";
 			}
 			if (reeferIDs.length() > 0) {
